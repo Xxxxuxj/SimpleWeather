@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "矢量日日历备忘录icon图标.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "矢量日日历备忘录icon图标-1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "矢量日日历备忘录icon图标-2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
