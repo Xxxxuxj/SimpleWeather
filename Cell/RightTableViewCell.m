@@ -12,6 +12,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
+    //cell初始化
     UIImage* img=[[UIImage imageNamed:@"delete"]imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     self.titleLabel.highlightedTextColor=[UIColor blackColor];
     
@@ -30,9 +31,9 @@
 
 
 
-
+//删除按钮的事件
 - (IBAction)deletCity:(id)sender {
-    NSLog(@"%@",self.titleLabel.text);
+    //发送通知到rightTableViewController 进行删除
     [[NSNotificationCenter defaultCenter] postNotificationName:@"DeleteCity" object:nil userInfo:@{@"chooseCity":self.titleLabel.text}];
 }
 @end

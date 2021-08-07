@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-
+//主要用作历史城市的管理 读写操作
 
 @interface Helper : NSObject
 {

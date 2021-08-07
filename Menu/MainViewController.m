@@ -14,16 +14,28 @@
 
 @interface MainViewController () <UITableViewDataSource,UITableViewDelegate,CLLocationManagerDelegate>
 {
+    
     UIImageView* imgView;
+    
+    
     NSString* currentNodeName;
+    
+    
     UITableView* myTableView;
+    
+    //现在的天气
     NSDictionary* cur_weather_info;
+    
+    //刷新功能的头部
     MJRefreshHeader* header;
+    
     //拿到位置的经纬度
     CLLocationManager* locationManager;
+    
     //解析地名
     CLGeocoder* geocoder;
     
+    //现在的城市
     NSString* cur_city;
     
 }
@@ -34,9 +46,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
+    //HomeIndicator hide
     [self prefersHomeIndicatorAutoHidden];
+    
+    
+    //创建通知 在选城市时post
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(chooseLocationAction:) name:@"ChooseLocationNotification" object:nil];
-    //self.title=@"天气";
+    
+    
+    //定位功能
     [self location];
     
     
@@ -46,13 +65,18 @@
     
 }
 
--(void)autoLocationAction:(NSNotification*)sender{
-    
-}
 
+
+//选城市的方法
 -(void)chooseLocationAction:(NSNotification*)sender{
+    
+    //将现在的城市更换为被选择的城市
     self->cur_city=sender.userInfo[@"chooseCity"];
+    
+    //插入到历史城市中
     [[[Helper alloc]init]insertCity:self->cur_city];
+    
+    //加载view
     [self initView];
 }
 
@@ -61,38 +85,53 @@
  
  */
 
+
+
+
+//加载mainview
 -(void)initView{
+    
+    //初始化 navigation bar
     Tool* tool=[Tool new];
     [self layoutNavigationBar:[tool returnDate:[NSDate new]] :[tool returnWeekdays:[NSDate new]] :cur_city];
     
+    
+    //请求现在的城市信息
     [self request:cur_city];
     
+    //将cur_city插入到histoycity中
     [[NSNotificationCenter defaultCenter]postNotificationName:@"InsertCity" object:nil userInfo:@{@"insertCity":cur_city}];
     
+    
+    
+    //mytableview的初始化
     myTableView=[[UITableView alloc]initWithFrame:CGRectMake(0, -44, self.view.bounds.size.width, self.view.bounds.size.height)  style:UITableViewStylePlain];
     myTableView.showsVerticalScrollIndicator=NO;
     [self.view addSubview:myTableView];
     header=[MJRefreshNormalHeader new];
-    //[header setHidden:true];
-    //__weak typeof(self) weekself=self;
-    //    __block UIViewController * strongBlock=self;
     
+    
+    //当版本超过ios11 时
     if (@available(iOS 11.0, *)) {
+        //隐藏好header
+        myTableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 
-    myTableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        myTableView.contentInset = UIEdgeInsetsMake(44, 0, 49, 0);
 
-    myTableView.contentInset = UIEdgeInsetsMake(44, 0, 49, 0);
-
-    myTableView.scrollIndicatorInsets = myTableView.contentInset;
+        myTableView.scrollIndicatorInsets = myTableView.contentInset;
 
     }
     
     [myTableView setMj_header:header];
+    
+    // 为了防止循环引用
+    __block MainViewController* mainself=self;
+
     [header setRefreshingBlock:^{
-        NSLog(@"下拉刷新");
-        [self layoutNavigationBar:[[Tool new]returnDate:[NSDate new]] :[[Tool new] returnWeekdays:[NSDate new]] :self->cur_city];
-        [self request:self->cur_city];
-        [[NSNotificationCenter defaultCenter]postNotificationName:@"InsertCity" object:nil userInfo:@{@"insertCity":self->cur_city}];
+        //NSLog(@"下拉刷新");
+        [mainself  layoutNavigationBar:[[Tool new]returnDate:[NSDate new]] :[[Tool new] returnWeekdays:[NSDate new]] :mainself->cur_city];
+        [mainself request:mainself->cur_city];
+        [[NSNotificationCenter defaultCenter]postNotificationName:@"InsertCity" object:nil userInfo:@{@"insertCity":mainself->cur_city}];
     }];
 
     
@@ -110,13 +149,14 @@
 
 
 
+//定位功能
 -(void)location{
     if([CLLocationManager locationServicesEnabled] == false){
         return;
     }else{
         locationManager=[CLLocationManager new];
         
-        NSLog(@"%@",[[UIDevice currentDevice]systemVersion]);
+        //NSLog(@"%@",[[UIDevice currentDevice]systemVersion]);
         float version=[[[UIDevice currentDevice]systemVersion] floatValue];
         if(version>=8.0){
             [locationManager requestAlwaysAuthorization];
@@ -131,8 +171,10 @@
     
 }
 
+
+//定位失败时
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
-    NSLog(@"定位失败:%@",[error debugDescription]);
+    //NSLog(@"定位失败:%@",[error debugDescription]);
     if([[Helper new]readChaceCity].count>0){
         self->cur_city= [[Helper new]readChaceCity][0];
     }else{
@@ -141,6 +183,8 @@
     [self initView];
 }
 
+
+//定位成功时
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations{
     if(locations.count >0){
         [manager stopUpdatingLocation];
@@ -150,6 +194,8 @@
         [self->geocoder reverseGeocodeLocation:locationInfo completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
             
             if(placemarks.count >0){
+                
+                
                 //回到主线程更新ui
                 dispatch_async(dispatch_get_main_queue(), ^{
                 CLPlacemark *place= placemarks[0];
@@ -160,7 +206,7 @@
                     
                     NSRange range= [self->cur_city rangeOfString:@"市"];
                     self->cur_city=[self->cur_city substringToIndex:range.location];
-                    NSLog(@"%@",self->cur_city);
+                   // NSLog(@"%@",self->cur_city);
                 }
                 
                 
@@ -178,6 +224,8 @@
  */
 
 
+
+//navigationbar的初始化
 -(void)layoutNavigationBar:(NSString*)date :(NSString*)weekday :(NSString*)cityName{
     
     self.navigationController.navigationBar.tintColor=[UIColor whiteColor];
@@ -190,22 +238,15 @@
     
     
     [[self navigationItem]setLeftBarButtonItems:[NSArray arrayWithObjects:catogryBarItem,dateBarItem,nil]];
-    
-//    UIBarButtonItem* shareBarItem=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"share"] style:UIBarButtonItemStylePlain target:self action:@selector(shareAction:)];
-    
     UIBarButtonItem* cityBarItem=[[UIBarButtonItem alloc]initWithTitle:cityName style:UIBarButtonItemStylePlain target:nil action:nil];
     UIBarButtonItem* settingBarItem=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"setting"] style:UIBarButtonItemStylePlain target:self action:@selector(settingAction:)];
     settingBarItem.imageInsets=UIEdgeInsetsMake(1, 0, 0, 0);
-//    NSDate *nowtime=[NSDate date];
-//    NSDateFormatter *format1=[[NSDateFormatter alloc] init];
-//    [format1 setDateFormat:@"hh:mm"];
-//    NSString *dateStr;
-//    dateStr=[format1 stringFromDate:nowtime];
-//    UIBarButtonItem* timelbl=[[UIBarButtonItem alloc]initWithTitle:dateStr style:UIBarButtonItemStylePlain target:nil action:nil];
-    //[[self navigationItem]setRightBarButtonItems:@[shareBarItem,cityBarItem,settingBarItem]];
     [[self navigationItem]setRightBarButtonItems:[NSArray arrayWithObjects:settingBarItem,cityBarItem,nil]];
     
 }
+
+
+//设置中 发送通知
 -(void)settingAction:(UIBarButtonItem*)sender{
     [[NSNotificationCenter defaultCenter]postNotificationName:@"AlertSetMenu" object:nil];
 }
@@ -221,6 +262,8 @@
 
 
 
+
+//请求数据 包括七天的和当天的
 -(void)request:(NSString*)cityName{
     
     //请求七天的数据
@@ -228,20 +271,17 @@
     NSURLSession* session=[NSURLSession sharedSession];
     
     
-    
-//    NSString* cityName=@"北京";
-    //NSString* urlString=[[NSString stringWithFormat:@"https://sapi.k780.com:88/?app=weather.future&weaid=\%@&&appkey=60677&sign=f3b7eb5a487f0a2ace9945be8a831835&format=json",cityName] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-    NSString* urlString=[[NSString stringWithFormat:@"http://api.k780.com/?app=weather.future&weaid=\%@&appkey=60677&sign=f3b7eb5a487f0a2ace9945be8a831835&format=json",cityName] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     //url中不能够出现中文等特殊字符 出现了则必须将其编码
+    NSString* urlString=[[NSString stringWithFormat:@"http://api.k780.com/?app=weather.future&weaid=\%@&appkey=60677&sign=f3b7eb5a487f0a2ace9945be8a831835&format=json",cityName] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+
+ 
     
-    //    NSString* urlString=[[NSString stringWithFormat:@"http://api.k780.com:88/?app=weather.future&weaid=\%@&&appkey=10003&sign=b59bc3ef6191eb9f747dd4e83c99f2a4&format=xml",cityName] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     NSURL* url=[[NSURL alloc]initWithString:urlString];
     
     
     
     NSURLSessionDataTask * task= [session dataTaskWithURL:url completionHandler:^(NSData* data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if(error == nil){
-            //NSLog(@"%@",[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]);
             
             
             //json解析
@@ -252,7 +292,7 @@
             NSDictionary* dict=array[0];
             
             WeatherInfo* wi=[[WeatherInfo alloc]initWithDict:dict];
-            NSLog(@"%@",wi.weather);
+            //NSLog(@"%@",wi.weather);
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.view.backgroundColor=[[Tool new]returnWeatherBGColor:wi.weather];
@@ -275,14 +315,7 @@
             });
             
             
-            
-            //            //xml解析
-            //
-            //            NSXMLParser* xlmparser=[[NSXMLParser alloc]initWithData:data];
-            //
-            //            xlmparser.delegate=self;
-            //
-            //            [xlmparser parse];
+
             
             
         }
@@ -309,7 +342,7 @@
             self->cur_weather_info=[[NSDictionary alloc]initWithDictionary:dict];
             
             
-            NSLog(@"%@",self->cur_weather_info);
+            //NSLog(@"%@",self->cur_weather_info);
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self->myTableView reloadData];
@@ -400,6 +433,9 @@
 }
 */
 
+
+//tableview中的初始化
+//每次更新都会更新一遍
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     MainTableViewCell* cell=[tableView dequeueReusableCellWithIdentifier:@"CellReuseIdentifier"];
     

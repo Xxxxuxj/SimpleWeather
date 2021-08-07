@@ -11,6 +11,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+//工具类
+//主要是对 天气日期格式的处理 得到需要的格式
+
+
+
 @interface Tool : NSObject
 -(NSString*)returnDate:(NSDate*)date;
 -(NSString*)returnWeekdays:(NSDate*)date;

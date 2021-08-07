@@ -13,11 +13,17 @@
 
 @interface ViewController ()
 
+
+//主界面 UIViewController
 @property(nonatomic,strong)UIViewController * mainViewController;
+
+//左界面 LeftTableViewController
 @property(nonatomic,strong)LeftTableViewController * leftViewController;
+
+//右界面 RightTableViewController
 @property(nonatomic,strong)RightTableViewController * rightViewController;
 
-//滑动速率
+//滑动速率 决定着转移界面需要滑动屏幕的距离
 @property(nonatomic,assign)CGFloat speed_f;
 
 
@@ -27,16 +33,23 @@
 
 @end
 
+
+
+
+
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
+    
+    //注册一个通知 执行showMainViewAction
+    //转到主界面
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainViewAction:) name:@"ChooseLocationNotification" object:nil];
     
 
-    
+    //初始化
     self.speed_f=1.0;
     self.condition_f=0;
     
@@ -54,21 +67,25 @@
     //设置rightview
     self.rightViewController=[RightTableViewController new];
     [self.view addSubview:self.rightViewController.view];
-    self.rightViewController.controller=self;
+    self.rightViewController.controller=(SettingTableViewController*) self;
     
     //最后添加main 保证其在最上层
     [self.view addSubview:self.mainViewController.view];
     
     
     
-    //隐藏
+    //将左右界面先隐藏
     self.leftViewController.view.hidden=true;
     self.rightViewController.view.hidden=true;
     
-    //设置滑动的动作
+    //设置滑动的手势
     UIGestureRecognizer* pan=[UIPanGestureRecognizer new];
+    //将方法绑定到pan
     [pan addTarget:self action:@selector(panAction:)];
-    //将动作添加到mainview中
+    
+    
+    //将手势添加到mainview中
+    //LeftTableView和RightTableView 中无该事件
     [self.mainViewController.view addGestureRecognizer:pan];
     
     
@@ -76,6 +93,9 @@
     
     
 }
+
+
+//显示主界面
 -(void)showMainViewAction:(NSNotification *)sender{
     [self showMainView];
 }
@@ -88,7 +108,7 @@
 }
 
 
-//滑动的选择器
+//滑动触发的方法 参数为UIPanGesturRecognizer手势
 -(void)panAction:(UIPanGestureRecognizer *)sender{
     
     
@@ -96,9 +116,11 @@
     //获取手指的位置改变
     CGPoint point= [sender translationInView:sender.view];
     
+    
+    
+    
+    
     //累加赋值给condition 作为滑动的距离
-    //但是有一个小bug 当一直小幅度滑动时
-    //滑动多次后 就会翻页
     self.condition_f += point.x;
     
     
@@ -106,7 +128,7 @@
     if(sender.view.frame.origin.x  >= 0){
         sender.view.center=CGPointMake(sender.view.center.x+point.x*self.speed_f, sender.view.center.y);
         
-        //另每时每刻mainview左上角的坐标都为（0.0）
+        //令偏移量重置为0
         [sender setTranslation:CGPointMake(0, 0) inView:self.view];
         
         self.rightViewController.view.hidden=true;
@@ -114,7 +136,7 @@
     }else{
         sender.view.center=CGPointMake(sender.view.center.x+point.x*self.speed_f, sender.view.center.y);
         
-        //另每时每刻mainview左上角的坐标都为（0.0）
+        //令偏移量重置为0 
         [sender setTranslation:CGPointMake(0, 0) inView:self.view];
         
         
@@ -138,6 +160,7 @@
             [self showRightView];
         }else{
             [self showMainView];
+            self.condition_f=0;
         }
     }
     

@@ -26,6 +26,8 @@
 //    [self.tableView addSubview:refreshControl];
     CGRect mainScreenBounds=[[UIScreen mainScreen]bounds];
     
+    
+    //初始化tableview
     self.tableView=[[UITableView alloc]initWithFrame:CGRectMake(0, 0,mainScreenBounds.size.width, mainScreenBounds.size.height)];
     
     self.tableView.backgroundColor=[UIColor blackColor];
@@ -39,6 +41,8 @@
     
     self.tableView.separatorStyle=UIAccessibilityTraitNone;
     
+    
+    //创建通知 刷新数据
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(refreshData:) name:@"LeftControllerTypeChangedNotification" object:nil];
     
     // Uncomment the following line to preserve selection between presentations.
@@ -54,6 +58,8 @@
     
 }
 
+
+//进行刷新 将数据更新
 -(void)refreshData:(NSNotification*)sender{
     NSArray* info=[sender.userInfo valueForKey:@"data"];
     //NSLog(@"%@", info);

@@ -34,12 +34,10 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-#warning Incomplete implementation, return the number of sections
     return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-#warning Incomplete implementation, return the number of rows
     return 1;
 }
 
@@ -67,12 +65,12 @@
 -(void)setMenu{
     UIAlertController* alert=[UIAlertController alertControllerWithTitle:nil message:@"是否确认清除城市信息(保留当前城市)" preferredStyle:1];
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            NSLog(@"OK Action");
+            //NSLog(@"OK Action");
             [[Helper new]removeCity];
         [[NSNotificationCenter defaultCenter]postNotificationName:@"ReloadTabelView" object:nil];
         }];
     UIAlertAction* noAction=[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        NSLog(@"NO Action");
+        //NSLog(@"NO Action");
     }];
     
     [alert addAction:okAction];

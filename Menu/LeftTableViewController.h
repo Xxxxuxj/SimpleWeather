@@ -13,7 +13,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface LeftTableViewController : UITableViewController <UITableViewDelegate,UITableViewDataSource>
 {
+    
+    //存放七天天气信息的可变数组
     NSMutableArray* dataSource;
+    
+    //fresh控键control
     UIRefreshControl* refreshControl;
 }
 

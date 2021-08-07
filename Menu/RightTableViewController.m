@@ -9,14 +9,19 @@
 #import "RightTableViewController.h"
 #import "RightTableViewCell.h"
 #import "AppDelegate.h"
-#import "addCityView.h"
 #import "Helper.h"
 @interface RightTableViewController () <UIPickerViewDelegate,UIPickerViewDataSource>
 {
+    
+    //历史城市
     NSArray* historyCity;
+    
     NSArray* section0Title;
     NSArray* section0Img;
+    
+    //添加的城市
     NSString* addedcity;
+    
     CGRect pickerViewFrame;
 }
 @property NSInteger toggle;
@@ -40,6 +45,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    
+    //初始化
     CGRect mainScreenBounds=[[UIScreen mainScreen]bounds];
     
     self.tableView=[[UITableView alloc]initWithFrame:CGRectMake(0, 0,mainScreenBounds.size.width, mainScreenBounds.size.height)];
@@ -48,8 +55,11 @@
     [self.tableView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:nil];
     
     
-    
+    //
     [self showHistoryCity];
+    
+    
+    
     section0Title=@[@"提醒",@"设置",@"支持"];
     section0Img=@[@"reminder",@"setting",@"contact"];
     // Uncomment the following line to preserve selection between presentations.
@@ -66,14 +76,20 @@
     self.tableView.separatorStyle=UIAccessibilityTraitNone;
     
     
+    
+    //对historycity 的操作 通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableView:) name:@"ReloadTabelView" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deleteCity:) name:@"DeleteCity" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(insertCity:) name:@"InsertCity" object:nil];
+    
+    //setting界面的通知
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(alertSetMenu) name:@"AlertSetMenu" object:nil];
     
     
+    
+    //所有省份和城市的信息
     NSString*path=[[NSBundle mainBundle]pathForResource:@"ProvincesAndCities" ofType:@"plist"];
-    NSLog(@"%@",path);
+    //NSLog(@"%@",path);
     NSArray* array=[[NSArray alloc]initWithContentsOfFile:path];
     self.dictionary=[NSMutableDictionary new];
     for(NSDictionary* dic in array){
@@ -201,7 +217,7 @@
         if(indexPath.row==2){
             UIAlertController* alert=[UIAlertController alertControllerWithTitle:@"联系或反馈" message:@"请邮箱联系：2205931267@qq.com" preferredStyle:1];
             UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    NSLog(@"OK Action");
+                    //NSLog(@"OK Action");
                 }];
             [alert addAction:okAction];
             [self presentViewController:alert animated:YES completion:nil];
@@ -209,7 +225,7 @@
         if(indexPath.row==0){
             UIAlertController* alert=[UIAlertController alertControllerWithTitle:@"操作提示" message:@"点击添加可添加城市,点击红色删除按钮即可删除城市" preferredStyle:1];
             UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    NSLog(@"OK Action");
+                    //NSLog(@"OK Action");
                 }];
             [alert addAction:okAction];
             [self presentViewController:alert animated:YES completion:nil];
@@ -294,7 +310,7 @@
     self.selectedProvince=self.provinceArray[0];
     [self.addCityView removeFromSuperview];
     [self reloadTableView:nil];
-    NSLog(@"%@",city);
+    //NSLog(@"%@",city);
 }
 /*
 // Override to support conditional editing of the table view.

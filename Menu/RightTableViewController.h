@@ -12,7 +12,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RightTableViewController : UITableViewController 
-
+ 
+//setting界面
 @property(nonatomic,strong)SettingTableViewController* controller;
 
 @end

@@ -11,6 +11,7 @@
 @implementation Tool
 
 
+//返回周几 中文
 -(NSString*)stringWeekdays:(NSString*)wd{
     
     if([wd isEqual:@"Monday"]){
@@ -34,6 +35,10 @@
     return @"--";
 }
 
+
+
+
+//格式化星期几
 -(NSString*)returnWeekdays:(NSDate*)date{
     NSDateFormatter* dateFormatter=[NSDateFormatter new];
     dateFormatter.locale=[NSLocale localeWithLocaleIdentifier:@"ch"];
@@ -45,6 +50,7 @@
 }
 
 
+//格式化月份日期
 -(NSString*)returnDate:(NSDate*)date{
     NSDateFormatter* dateFormatter=[NSDateFormatter new];
     dateFormatter.locale=[NSLocale localeWithLocaleIdentifier:@"ch"];
@@ -52,6 +58,9 @@
     return [dateFormatter stringFromDate:date];
 }
 
+
+
+//将十六进制转换为颜色
 +(UIColor *)colorWithHexString:(NSString *)hexColor alpha:(float)opacity{
     NSString * cString = [[hexColor stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] uppercaseString];
     
@@ -89,6 +98,9 @@
 }
 
 
+
+
+//格式化请求的天气转换为所需要的天气
 -(NSString*)returnWeatherType:(NSString*)weatherType{
     
     NSString* path=[[NSBundle mainBundle]pathForResource:@"weatherBG" ofType:@"plist"];
@@ -106,6 +118,10 @@
     return weatherType;
 }
 
+
+
+
+//根据weatherType 得到相应的提示message
 -(NSString*)returnMsg:(NSString*)weatherType{
     
     NSString* path=[[NSBundle mainBundle]pathForResource:@"msg" ofType:@"plist"];
@@ -125,6 +141,8 @@
 
 
 
+
+//根据weatherType 得到相应的图片
 -(UIImage*)returnWeatherImg:(NSString*)weatherType{
     
     NSString* path=[[NSBundle mainBundle]pathForResource:@"weatherImg" ofType:@"plist"];
@@ -143,6 +161,8 @@
 
 
 
+//根据weatherType 得到对应的颜色
+//使用到了十六进制转换为颜色的方法
 -(UIColor*)returnWeatherBGColor:(NSString*)weatherType{
     
     NSString* path=[[NSBundle mainBundle]pathForResource:@"weatherBG" ofType:@"plist"];
@@ -159,6 +179,10 @@
     return [UIColor grayColor];
 }
 
+
+
+
+//返回格式为MM/dd的日期
 -(NSString *)returnNeedDay:(NSString*)getDateString{
     NSDateFormatter* dateFormatter=[NSDateFormatter new];
     dateFormatter.locale=[NSLocale localeWithLocaleIdentifier:@"ch"];
@@ -172,6 +196,10 @@
     
 }
 
+
+
+
+//根据星期几返回周几
 -(NSString*)returnWeek:(NSString*)weekday{
     if([weekday isEqualToString:@"星期一"]){
         return @"周一";
